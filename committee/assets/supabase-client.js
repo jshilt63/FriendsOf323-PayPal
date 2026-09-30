@@ -1,10 +1,13 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/+esm";
 import { sandboxConfig } from "../../sandbox-config.js";
-if (!sandboxConfig.supabaseUrl || !sandboxConfig.supabasePublishableKey) {
-  throw new Error("Configure the separate PayPal test database in sandbox-config.js before using the portal.");
+if (sandboxConfig.paypalEnvironment !== "sandbox") {
+  throw new Error("This development repository requires PayPal sandbox mode.");
 }
-if (new URL(sandboxConfig.supabaseUrl).hostname === "vwzzupezgiffqgmmhxed.supabase.co") {
-  throw new Error("The PayPal test repository cannot use the current live Stripe database.");
+if (!sandboxConfig.sandboxDataReady) {
+  throw new Error("PayPal sandbox portal is paused until isolated sandbox table routing is implemented in the existing Supabase project.");
+}
+if (!sandboxConfig.supabaseUrl || !sandboxConfig.supabasePublishableKey) {
+  throw new Error("Configure the shared Supabase project in sandbox-config.js.");
 }
 export const supabase = createClient(sandboxConfig.supabaseUrl, sandboxConfig.supabasePublishableKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: "friends323-paypal-sandbox-auth" }
