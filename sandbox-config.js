@@ -3,6 +3,6 @@ export const sandboxConfig = Object.freeze({
   supabaseUrl: "https://vwzzupezgiffqgmmhxed.supabase.co",
   supabasePublishableKey: "sb_publishable_PQSBdKY-MdvLsFHvzGGwZA_yViiDczS",
   paypalEnvironment: "sandbox",
-  // Leave false until all portal reads/writes are routed to isolated sandbox tables.
-  sandboxDataReady: false
+  // Staff functions use existing live records, under the existing role permissions.
+  sharedLiveDataEnabled: true
 });

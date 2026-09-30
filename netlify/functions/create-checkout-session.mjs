@@ -529,6 +529,16 @@ export default async (request) => {
   const itemsInput = Array.isArray(payload?.items) ? payload.items : [];
   const requestedProcessingCost = Number(payload?.processing_cost ?? 0);
   const paymentMethod = payload?.payment_method === "cash" ? "cash" : "online";
+
+  // This repository is the PayPal development site. Its inherited online branch
+  // still charges Stripe, so stop before any customer/order writes until replaced.
+  if (paymentMethod === "online") {
+    return jsonResponse(503, {
+      error: "You reached the final payment step. PayPal checkout is not connected yet. No order was created and no payment was charged.",
+      code: "PAYPAL_CHECKOUT_NOT_READY"
+    });
+  }
+
   const fulfillmentMethod = nonEmptyText(payload?.fulfillment_method, 30);
   const allowedFulfillmentMethods = new Set(["pickup", "local_delivery", "shipping"]);
 

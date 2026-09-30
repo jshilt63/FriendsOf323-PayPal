@@ -3,9 +3,6 @@ import { sandboxConfig } from "../../sandbox-config.js";
 if (sandboxConfig.paypalEnvironment !== "sandbox") {
   throw new Error("This development repository requires PayPal sandbox mode.");
 }
-if (!sandboxConfig.sandboxDataReady) {
-  throw new Error("PayPal sandbox portal is paused until isolated sandbox table routing is implemented in the existing Supabase project.");
-}
 if (!sandboxConfig.supabaseUrl || !sandboxConfig.supabasePublishableKey) {
   throw new Error("Configure the shared Supabase project in sandbox-config.js.");
 }

@@ -1,6 +1,6 @@
 [build]
   publish = "."
-  functions = "sandbox/functions"
+  functions = "netlify/functions"
 
 [build.environment]
   PAYPAL_ENV = "sandbox"
