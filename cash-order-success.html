@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Order Received | Friends of 323</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+    <main class="payment-result-page">
+        <section class="payment-result-card">
+            <span class="hero__eyebrow">Friends of 323 Coffee</span>
+            <h1>Order Received</h1>
+            <p>Your coffee order has been saved.</p>
+
+            <div class="payment-result-status">
+                <strong>Payment Due</strong>
+                <span>Pay cash to the Scout's parent or your Den Leader.</span>
+            </div>
+
+            <p id="cash-order-reference" class="payment-result-note"></p>
+
+            <p class="payment-result-note">
+                Your order will remain marked as awaiting payment until the cash is received.
+                Once payment is recorded, it will move into the roaster-ordering workflow.
+            </p>
+
+            <p class="payment-result-note">
+                A confirmation has been sent to the email address entered with your order.
+            </p>
+
+            <a class="checkout-primary-link" href="index.html">Return to Friends of 323</a>
+        </section>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const order = params.get("order");
+        const reference = document.getElementById("cash-order-reference");
+        if (order) {
+            reference.textContent = `Storefront order: ${order}`;
+        }
+    </script>
+</body>
+</html>

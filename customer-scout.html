@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer & Scout Information | Friends of Pack 323</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+<body>
+    <div class="impact-bar">
+        <span aria-hidden="true">★</span>
+        Every purchase helps provide activities, supplies, and opportunities for local youth in Pack 323.
+    </div>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="index.html" aria-label="Friends of Pack 323 home">
+                <span class="brand__mark" aria-hidden="true">
+                    <span class="brand__mountain"></span>
+                    <span class="brand__trail"></span>
+                </span>
+                <span class="brand__copy">
+                    <span class="brand__eyebrow">Community Fundraising Store</span>
+                    <span class="brand__name">Friends of Pack 323</span>
+                    <span class="brand__tagline">Great products. Stronger youth programs.</span>
+                </span>
+            </a>
+
+            <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-navigation">
+                <span class="sr-only">Open navigation menu</span>
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="store.html">Shop</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="checkout-page">
+        <section class="checkout-heading">
+            <span class="hero__eyebrow">Checkout Step 1</span>
+            <h1>Customer &amp; Scout Information</h1>
+            <p>Tell us who the order is for and which Scout or Scouts should receive fundraising credit.</p>
+        </section>
+
+        <div id="checkout-empty" class="checkout-empty" hidden>
+            <h2>Your cart is empty</h2>
+            <p>Add coffee to your cart before continuing.</p>
+            <a class="checkout-primary-link" href="store.html">Return to Shop</a>
+        </div>
+
+        <form id="customer-scout-form" class="checkout-layout" novalidate>
+            <div class="checkout-main">
+                <section class="checkout-panel" aria-labelledby="customer-heading">
+                    <div class="checkout-panel__heading">
+                        <span class="checkout-step">1</span>
+                        <div>
+                            <h2 id="customer-heading">Customer Information</h2>
+                            <p>Fields marked required are needed to continue.</p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-form-grid">
+                        <label>
+                            <span>First Name *</span>
+                            <input id="first-name" name="first_name" autocomplete="given-name" required>
+                        </label>
+                        <label>
+                            <span>Last Name *</span>
+                            <input id="last-name" name="last_name" autocomplete="family-name" required>
+                        </label>
+                        <label>
+                            <span>Email *</span>
+                            <input id="email" name="email" type="email" autocomplete="email" required>
+                        </label>
+                        <label>
+                            <span>Phone</span>
+                            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="numeric" maxlength="13" placeholder="(816)555-1234">
+                        </label>
+                        <label class="checkout-form-grid__wide">
+                            <span>Address *</span>
+                            <input id="address-1" name="address_line_1" autocomplete="address-line1" required>
+                        </label>
+                        <label class="checkout-form-grid__wide">
+                            <span>Address Line 2</span>
+                            <input id="address-2" name="address_line_2" autocomplete="address-line2">
+                        </label>
+                        <label>
+                            <span>City *</span>
+                            <input id="city" name="city" autocomplete="address-level2" required>
+                        </label>
+                        <label>
+                            <span>State *</span>
+                            <input id="state" name="state" autocomplete="address-level1" value="MO" maxlength="2" required>
+                        </label>
+                        <label>
+                            <span>ZIP Code *</span>
+                            <input id="postal-code" name="postal_code" autocomplete="postal-code" required>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="checkout-panel" aria-labelledby="fulfillment-heading">
+                    <div class="checkout-panel__heading">
+                        <span class="checkout-step">2</span>
+                        <div>
+                            <h2 id="fulfillment-heading">How will you receive your order?</h2>
+                            <p>Choose pickup, local delivery, or shipping. Pickup does not require a delivery-area match.</p>
+                        </div>
+                    </div>
+
+                    <div class="payment-choice-grid fulfillment-choice-grid">
+                        <label class="payment-choice">
+                            <input type="radio" name="fulfillment_method" value="pickup" required>
+                            <span class="payment-choice__copy">
+                                <strong>Pickup / No Delivery Needed</strong>
+                                <span>I will arrange to pick up the coffee or receive it through someone I know.</span>
+                            </span>
+                        </label>
+                        <label class="payment-choice">
+                            <input type="radio" name="fulfillment_method" value="local_delivery" required>
+                            <span class="payment-choice__copy">
+                                <strong>Local Delivery</strong>
+                                <span>Friends of 323 will check whether this address is within an available delivery area.</span>
+                            </span>
+                        </label>
+                        <label class="payment-choice">
+                            <input type="radio" name="fulfillment_method" value="shipping" required>
+                            <span class="payment-choice__copy">
+                                <strong>Shipping</strong>
+                                <span id="shipping-option-description">Shipping is calculated from the number of coffee bags in this order.</span>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="checkout-panel" aria-labelledby="scout-heading">
+                    <div class="checkout-panel__heading">
+                        <span class="checkout-step">3</span>
+                        <div>
+                            <h2 id="scout-heading">Select Scout(s)</h2>
+                            <p>Select one or more Scouts. If you select more than one, you will assign each bag below.</p>
+                        </div>
+                    </div>
+
+                    <div id="scout-status" class="scout-status" role="status">Loading Scouts…</div>
+
+                    <div id="scout-picker" class="scout-picker" hidden>
+                        <div id="selected-scouts" class="selected-scouts" aria-live="polite"></div>
+
+                        <label class="scout-search">
+                            <span>Search Scout name</span>
+                            <input id="scout-search-input"
+                                   type="search"
+                                   placeholder="Type first or last name…"
+                                   autocomplete="off">
+                        </label>
+
+                        <div id="general-fund-option" class="general-fund-option"></div>
+
+                        <div id="scout-results" class="scout-results" role="listbox"
+                             aria-label="Scout search results"></div>
+
+                        <p id="scout-results-note" class="scout-results-note"></p>
+                    </div>
+                </section>
+
+                <section id="allocation-panel" class="checkout-panel" aria-labelledby="allocation-heading" hidden>
+                    <div class="checkout-panel__heading">
+                        <span class="checkout-step">4</span>
+                        <div>
+                            <h2 id="allocation-heading">Assign Fundraising Credit</h2>
+                            <p>Every coffee bag must be assigned to exactly one selected Scout.</p>
+                        </div>
+                    </div>
+
+                    <div class="allocation-toolbar">
+                        <button id="split-evenly" type="button" class="checkout-secondary-button">Split All Evenly</button>
+                        <span id="allocation-status" class="allocation-status"></span>
+                    </div>
+
+                    <div id="allocation-list" class="allocation-list"></div>
+                </section>
+            </div>
+
+            <aside class="checkout-sidebar">
+                <section class="checkout-panel checkout-review" aria-labelledby="review-heading">
+                    <h2 id="review-heading">Order Review</h2>
+                    <div id="checkout-cart-items" class="checkout-cart-items"></div>
+                    <div class="checkout-review__total">
+                        <span>Total</span>
+                        <strong id="checkout-total">$0.00</strong>
+                    </div>
+                    <a class="checkout-edit-cart" href="store.html">← Edit Cart</a>
+                </section>
+
+                <button id="continue-review" class="checkout-submit" type="submit" disabled>
+                    Continue to Final Review
+                </button>
+                <p class="checkout-submit-note">No payment will be collected yet.</p>
+            </aside>
+        </form>
+
+        <section id="final-review" class="checkout-panel final-review" hidden aria-labelledby="final-review-heading">
+            <div class="final-review__header">
+                <span class="checkout-step">✓</span>
+                <div>
+                    <span class="hero__eyebrow">Checkout Step 2</span>
+                    <h2 id="final-review-heading">Final Review</h2>
+                    <p>Review the customer information, coffee selections, fundraising-credit assignments, and choose how you would like to pay.</p>
+                </div>
+            </div>
+
+            <div id="final-review-content"></div>
+
+
+            <div id="checkout-result" class="test-order-result" hidden aria-live="polite"></div>
+
+            <div class="final-review__actions">
+                <button id="edit-information" type="button" class="checkout-secondary-button">
+                    ← Go Back &amp; Make Changes
+                </button>
+                <button id="continue-to-payment" type="button" class="checkout-submit">
+                    Continue to Secure Payment
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script src="customer-scout.js?v=1.9.7" defer></script>
+</body>
+</html>

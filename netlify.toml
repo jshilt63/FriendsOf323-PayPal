@@ -1,0 +1,11 @@
+[build]
+  publish = "."
+  functions = "sandbox/functions"
+
+[build.environment]
+  PAYPAL_ENV = "sandbox"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

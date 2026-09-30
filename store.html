@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Coffee | Friends of Pack 323</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+</head>
+
+<body>
+    <div class="impact-bar">
+        <span aria-hidden="true">★</span>
+        Every purchase helps provide activities, supplies, and opportunities for local youth in Pack 323.
+    </div>
+
+    <aside id="store-announcement-banner" class="store-announcement-banner" aria-live="polite" hidden>
+        <div class="store-announcement-banner__inner">
+            <strong id="store-announcement-banner-title"></strong>
+            <span id="store-announcement-banner-message"></span>
+        </div>
+    </aside>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="index.html" aria-label="Friends of Pack 323 home">
+                <span class="brand__mark" aria-hidden="true">
+                    <span class="brand__mountain"></span>
+                    <span class="brand__trail"></span>
+                </span>
+
+                <span class="brand__copy">
+                    <span class="brand__eyebrow">Community Fundraising Store</span>
+                    <span class="brand__name">Friends of Pack 323</span>
+                    <span class="brand__tagline">Great products. Stronger youth programs.</span>
+                </span>
+            </a>
+
+            <button class="menu-button" type="button"
+                    aria-expanded="false"
+                    aria-controls="main-navigation">
+                <span class="sr-only">Open navigation menu</span>
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav id="main-navigation" class="main-nav" aria-label="Main navigation">
+                <a href="index.html">Home</a>
+                <a href="store.html" aria-current="page">Shop</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero hero--shop">
+            <div class="hero__inner">
+                <div class="hero__content">
+                    <span class="hero__eyebrow">Shop with a purpose</span>
+                    <h1>Support Friends<br>of Pack 323</h1>
+                    <p>
+                        Your purchase helps fund activities, supplies,
+                        service projects, and opportunities for local youth.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="store" class="store-section">
+            <div class="section-heading">
+                <span class="section-heading__line" aria-hidden="true"></span>
+                <div>
+                    <h2>Our Coffee</h2>
+                    <p>Premium coffee. Purposeful impact.</p>
+                </div>
+                <span class="section-heading__line" aria-hidden="true"></span>
+            </div>
+
+            <div id="store-status" class="store-status" role="status">
+                Loading coffee…
+            </div>
+
+            <div id="product-grid" class="store-product-grid" hidden></div>
+
+
+        <aside class="shopping-cart" aria-labelledby="cart-title">
+            <div class="shopping-cart__header">
+                <div>
+                    <span class="shopping-cart__eyebrow">Your Order</span>
+                    <h2 id="cart-title">Shopping Cart</h2>
+                </div>
+                <span id="cart-count" class="shopping-cart__count" aria-live="polite">0 items</span>
+            </div>
+
+            <div id="cart-empty" class="shopping-cart__empty">
+                Your cart is empty. Choose a coffee size above and add it to your order.
+            </div>
+
+            <div id="cart-items" class="shopping-cart__items" hidden></div>
+
+            <div id="cart-summary" class="shopping-cart__summary" hidden>
+                <div class="shopping-cart__total-row">
+                    <span>Order total</span>
+                    <strong id="cart-total">$0.00</strong>
+                </div>
+                <a id="continue-checkout" class="shopping-cart__checkout" href="customer-scout.html">
+                    Continue to Customer &amp; Scout Information
+                </a>
+                <p class="shopping-cart__note">
+                    Payment is not connected yet. The next page collects customer information and fundraising-credit assignments.
+                </p>
+            </div>
+        </aside>
+        </section>
+
+        <section class="shipping-bar" aria-label="Store service information">
+            <div><strong>Freshly Roasted</strong><span>Small-batch coffee</span></div>
+            <div><strong>Purposeful Purchase</strong><span>Supporting local youth!</span></div>
+            <div><strong>Secure Checkout</strong><span>Secure payments powered by Stripe</span></div>
+        </section>
+    </main>
+
+    <footer class="storefront-footer">
+        <div class="storefront-footer__inner">
+            <p>&copy; 2026 Friends of Pack 323. All rights reserved.</p>
+            <a href="/committee/dashboard.html" aria-label="Admin Portal" title="Admin Portal" class="admin-portal-mug">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                    <path d="M25 35h42v32c0 6.6-5.4 12-12 12H37c-6.6 0-12-5.4-12-12V35z"
+                          stroke="#0E3A2F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="21" y="30" width="50" height="5" rx="2.5" fill="#0E3A2F"/>
+                    <path d="M67 43h8.5c4.7 0 8.5 3.8 8.5 8.5v3c0 4.7-3.8 8.5-8.5 8.5H67"
+                          stroke="#0E3A2F" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="46" cy="57" r="11" stroke="#E5A93C" stroke-width="4.5"/>
+                    <path d="M46 42v4M46 68v4M31 57h4M61 57h4M35.5 46.5l2.8 2.8M53.7 64.7l2.8 2.8M35.5 67.5l2.8-2.8M53.7 49.3l2.8-2.8"
+                          stroke="#E5A93C" stroke-width="4.5" stroke-linecap="round"/>
+                    <circle cx="46" cy="54" r="2.5" fill="#0E3A2F"/>
+                    <path d="M44.5 54h3l1 7h-5l1-7z" fill="#0E3A2F"/>
+                </svg>
+            </a>
+        </div>
+    </footer>
+
+    <dialog id="store-announcement-dialog" class="store-announcement-dialog" aria-labelledby="store-announcement-title">
+        <div class="store-announcement-dialog__card">
+            <button type="button" class="store-announcement-dialog__close" data-announcement-close aria-label="Close announcement">×</button>
+            <span class="store-announcement-dialog__eyebrow">Coffee Operations Notice</span>
+            <h2 id="store-announcement-title"></h2>
+            <p id="store-announcement-message"></p>
+            <button type="button" class="store-announcement-dialog__button" data-announcement-close>Got it</button>
+        </div>
+    </dialog>
+
+    <script src="store.js?v=1.9.6" defer></script>
+</body>
+</html>
