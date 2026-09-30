@@ -874,7 +874,7 @@ function buildReview() {
                     >
                     <span class="payment-choice__copy">
                         <strong>Pay Online</strong>
-                        <span>Secure card payment through Stripe.</span>
+                        <span>PayPal checkout is being connected; you can review your order before the final payment step.</span>
                     </span>
                 </label>
 
@@ -1072,7 +1072,7 @@ async function continueToPayment() {
     result.className = "test-order-result";
     result.textContent = paymentMethod === PAYMENT_METHOD_CASH
         ? "Creating your Friends of 323 cash order…"
-        : "Creating your Friends of 323 order and secure Stripe Checkout session…";
+        : "Checking PayPal checkout availability…";
 
     try {
         const response = await fetch(CREATE_CHECKOUT_SESSION_URL, {
@@ -1111,7 +1111,7 @@ async function continueToPayment() {
         }
 
         if (!data.checkout_url) {
-            throw new Error("Stripe did not return a checkout URL.");
+            throw new Error("The payment service did not return a checkout URL.");
         }
 
         window.location.assign(data.checkout_url);

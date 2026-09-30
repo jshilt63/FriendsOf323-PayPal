@@ -1,56 +1,37 @@
-# Friends of 323 — separate PayPal development repository
+# Friends of 323 — PayPal development site
 
-This is the uploaded September 30, 2026 working tree, copied into a new Git repository with no remote pointing to the current Stripe repository. PayPal checkout is not implemented yet. The original Stripe repository and live deployment are unchanged.
+This repository develops the PayPal transition while the current Stripe repository and Netlify site continue independently. Both sites use the existing Supabase project `vwzzupezgiffqgmmhxed`.
 
-## Import into GitHub
+## Current access
 
-Create an empty PRIVATE repository named `FriendsOf323-PayPal` under `jshilt63`. Do not initialize it with a README, license, or gitignore.
+At the owner's request, the shop feeds and staff functions are restored. `netlify.toml` deploys the original `netlify/functions` directory. The portal connects to existing Supabase Auth and application tables without the earlier sandbox readiness gate. Existing authentication, roles, and RLS still apply.
 
-The accompanying Git bundle includes the baseline and shared-database approach update. In Windows PowerShell:
+Edits, cash receipts, adjustments, supplier submissions, and other staff actions affect real shared records. This is not a copied database. The old placeholder directory `sandbox/functions` is no longer deployed.
 
-```powershell
-cd C:\Development
-git clone .\FriendsOf323-PayPal.bundle FriendsOf323-PayPal
-cd FriendsOf323-PayPal
-git remote remove origin
-git remote add origin https://github.com/jshilt63/FriendsOf323-PayPal.git
-git push -u origin main
-```
+Online checkout stops at the final payment step with `PAYPAL_CHECKOUT_NOT_READY`, before creating customers/orders or contacting Stripe. PayPal create/capture/webhook integration is not implemented yet. Cash orders follow the existing workflow and create actual unpaid orders and send their usual notifications when configured.
 
-Download/extract this package to `C:\Development` first. The `source` folder is also supplied for inspection; use the bundle commands to retain its prepared commit.
+Existing Stripe payout and refund features are still Stripe features. They require Stripe credentials and can move real funds. They have not been relabeled or converted to PayPal. Supplier emails and shipping labels also use real services when configured. Restoring access does not mean any of these actions have been executed by this update.
 
-## Shared Supabase project, separate test site
+## Netlify configuration
 
-1. Create a NEW Netlify site connected only to `FriendsOf323-PayPal`. Keep the existing Stripe repository and live site operational.
-2. Keep the existing Supabase project (`vwzzupezgiffqgmmhxed`). No historical-data migration or staff-account migration is needed for this approach.
-3. Add dedicated sandbox tables in that project for synthetic orders, items, payments, refunds, and sandbox credit calculations. Do not attach sandbox payments to real orders. Use explicit grants and RLS, and have every backend operation validate its environment. These tables and routing are planned; they have NOT been installed by this package.
-4. Reuse existing Supabase Auth identities with the existing staff role checks, plus authorization for sandbox data. Keep test browser sessions under a separate storage key.
-5. In PayPal Developer, create a sandbox application and virtual business and buyer accounts. Add sandbox credentials only to the new site's environment variables. Sandbox funds cannot fund the real debit card.
-6. Keep real email, supplier submissions, payouts, and shipping label purchases disabled during testing. Do not copy those live credentials into the test site.
+Keep the new Netlify site connected only to `jshilt63/FriendsOf323-PayPal`, branch `Preview` for this development update. Leave the current Stripe site's repository mapping unchanged.
 
-## Current deployment behavior
+Set `SUPABASE_URL` to the existing project URL and `SUPABASE_SERVICE_ROLE_KEY` to that project's server-only key in the new Netlify site's function environment. Never put the service-role key in source or browser files. Product/Scout feeds require these variables; staff browser login uses the public configuration in `sandbox-config.js`.
 
-`netlify.toml` deploys only `sandbox/functions`. All placeholder backend endpoints return 503 without invoking the copied Stripe functions. The original functions in `netlify/functions` remain reference code.
+Other staff backend functions need the same environment variable names they use on the current site. Missing configuration results in their normal errors. No new Netlify environment variables were set by this code update.
 
-The public shared-project URL/key are now configured in `sandbox-config.js`. The portal deliberately remains paused by `sandboxDataReady: false`, because the copied portal still contains direct writes to live tables. Do not flip this flag to enable the old portal: first implement and verify sandbox routing throughout the client and backend. A new repository alone does not isolate database writes.
+PayPal app credentials (`PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`) must be sandbox credentials during development. `PAYPAL_ENV=sandbox` remains configured. Sandbox funds cannot fund the real debit card.
 
-## Payment relationships for the live transition
+## Update your local working copy
 
-Add provider-neutral payment records linked to existing orders, with Stripe/PayPal provider, environment, provider transaction ID, amount/currency, actual fees, and status. Track refunds and verified webhook events separately with unique provider/environment/event IDs to prevent duplicate processing. Existing Stripe columns and references remain in place for compatibility and reconciliation.
+Select branch `Preview` in VS Code. Extract the accompanying update ZIP into the working repository folder (the one containing `store.html` and `netlify.toml`), replacing its matching files. Commit the changes and Publish Branch / Sync Changes. GitHub did not accept the connector write, so this update has not been published remotely. In Netlify, deploy branch `Preview` after it is published.
 
-Sandbox relationships point only to sandbox orders in separate tables. Live relationships point to existing production orders after release. Sandbox capture/webhook handlers must never update production orders, Scout credits, roaster obligations, or bank-deposit allocations.
+## Remaining implementation
 
-Changes will be additive while Stripe runs. Backfill historical Stripe relationships only after inspecting the live schema and reconciling totals; never recapture or charge historical orders. Keep production legacy structures until the current Stripe site no longer depends on them.
+- Replace inherited Stripe online checkout with PayPal sandbox create/capture, server-side pricing, verified webhooks, idempotency, reconciliation, and refunds.
+- Add provider-neutral payment relationships alongside current order records, preserving historical Stripe IDs and compatibility.
+- Keep PayPal sandbox payment activity separate from production payment status and Scout credits, even though staff administration uses shared live tables.
+- Remove the Stripe-specific roaster funding and payout workarounds in the PayPal version while retaining history, cash accounting, supplier obligations, and Scout/General Fund allocations.
+- Test failed, canceled, duplicate, delayed-webhook, refund and successful payments before enabling live PayPal checkout.
 
-## Next implementation
-
-- Implement isolated sandbox data access and authorization before enabling the test portal.
-- Replace Stripe checkout with PayPal sandbox create/capture, server-side amount validation, verified webhooks, idempotency, and payment reconciliation.
-- Remove Roaster Funding Payout and Stripe balance/payout dependencies from this new version.
-- Keep cash receipt/deposit accounting, supplier obligations, Scout/General Fund allocations, audit history, and existing transaction references.
-- Record PayPal-to-Pack transfers against actual completed transfers; never relabel a Stripe payout call as a PayPal transfer.
-- Adapt processing fees and refunds to the actual PayPal method/fees.
-- Test successful, declined, canceled, duplicate, delayed-webhook, partial/refund, cash, supplier-payment recording, and Scout transfer cases.
-- Switch live only after separate testing and a controlled real transaction. Debit-card supplier payment requires a later live test; it cannot be proven with sandbox funds.
-
-No production database migrations or account changes have been made by this package.
+No production schema changes or actual purchases, payouts, refunds, supplier emails, or labels were executed as part of restoring access.
