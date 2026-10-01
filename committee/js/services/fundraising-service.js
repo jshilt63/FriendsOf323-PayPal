@@ -45,29 +45,19 @@ export const FundraisingService = {
   async payoutReport(payoutId) {
     return unwrap(await supabase.from("credit_payout_report").select("*").eq("payout_id",payoutId).order("scout_last_name").order("scout_first_name"));
   },
-  async payoutInfo() {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session?.access_token) throw new Error("Your session has expired. Sign in again.");
-    const result = await fetch("/.netlify/functions/stripe-payout-info", {
-      method:"GET",
-      headers:{Authorization:`Bearer ${session.access_token}`}
-    });
-    const body = await result.json().catch(()=>({}));
-    if (!result.ok) throw new Error(body.error || "Stripe payout balance could not be loaded.");
-    return body;
+  async paypalTransferReport(id) {
+    const transfer = unwrap(await supabase.from("paypal_pack_transfers").select("*").eq("id",id).single());
+    const lines = unwrap(await supabase.from("paypal_pack_transfer_lines").select("amount,scouts(first_name,last_name,scout_guardians(is_primary,guardians(first_name,last_name)))").eq("transfer_id",id));
+    return lines.map(line=>{const guardian=line.scouts?.scout_guardians?.find(g=>g.is_primary)?.guardians;return {...transfer,amount:line.amount,total_amount:transfer.amount,payout_number:transfer.reference,status:"paid",scout_first_name:line.scouts?.first_name,scout_last_name:line.scouts?.last_name,guardian_first_name:guardian?.first_name,guardian_last_name:guardian?.last_name};});
   },
-  async createPayout({purpose, lines, bankOffsetAmount = 0}) {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session?.access_token) throw new Error("Your session has expired. Sign in again.");
-    const requestKey = crypto.randomUUID();
-    const result = await fetch("/.netlify/functions/create-credit-payout", {
-      method:"POST",
-      headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`},
-      body:JSON.stringify({request_key:requestKey,purpose,lines,bank_offset_amount:bankOffsetAmount})
-    });
-    const body = await result.json().catch(()=>({}));
-    if (!result.ok) throw new Error(body.error || "The Stripe payout could not be created.");
-    return body;
+  async paypalTransfers() {
+    return unwrap(await supabase.from("paypal_pack_transfers").select("*").order("created_at",{ascending:false}));
+  },
+  async recordPaypalTransfer(payload) {
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!session?.access_token)throw new Error("Please sign in again.");
+    const res=await fetch("/.netlify/functions/paypal-record-pack-transfer",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`},body:JSON.stringify(payload)});
+    const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"Transfer could not be recorded.");return data;
   },
   async treasurerSnapshot() {
     return unwrap(await supabase.from("order_items")

@@ -179,27 +179,6 @@ export const PurchaseOrdersService = {
     return result;
   },
 
-  async roasterFunding(purchaseOrderId) {
-    const [setting, payouts] = await Promise.all([
-      supabase.from("roaster_funding_settings").select("enabled").eq("id",1).single(),
-      supabase.from("roaster_funding_payouts").select("id,amount,status,stripe_payout_id,stripe_arrival_date,failure_message").eq("purchase_order_id",purchaseOrderId).order("created_at",{ascending:false}).limit(1)
-    ]);
-    return { enabled: unwrap(setting,"Roaster funding setting could not be loaded.")?.enabled,
-      payout: unwrap(payouts,"Roaster funding status could not be loaded.")[0]||null };
-  },
-
-  async createRoasterFunding(purchaseOrderId) {
-    const {data:{session}}=await supabase.auth.getSession();
-    if(!session?.access_token)throw new Error("Sign in again before creating a payout.");
-    const response=await fetch("/.netlify/functions/create-roaster-funding-payout",{
-      method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`},
-      body:JSON.stringify({purchase_order_id:purchaseOrderId})
-    });
-    const result=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(result.error||"Roaster funding payout failed.");
-    return result;
-  },
-
   async transition(purchaseOrderId, status) {
     return unwrap(
       await supabase.rpc("transition_purchase_order", {

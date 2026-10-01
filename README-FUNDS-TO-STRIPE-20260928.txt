@@ -1,3 +1,5 @@
+HISTORICAL STRIPE DOCUMENT: This workflow is no longer used in the PayPal repository. See README-PAYPAL-TESTING.md.
+
 Friends of 323 — cash and Venmo funds tracking
 
 1. Apply supabase/migrations/20260928_001_track_funds_to_stripe.sql if it is not already installed. Apply 20260928_002_correct_funding_order_total.sql for installations that used the initial version of 001. The live Friends of 323 database received the 002 correction on September 28, 2026.

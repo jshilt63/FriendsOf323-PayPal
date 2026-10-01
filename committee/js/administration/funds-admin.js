@@ -9,14 +9,14 @@ export function fundsPanelMarkup() {
   return `<section id="funds-panel" class="admin-panel" hidden>
     <div class="panel">
       <h2>Pack Bank Deposits</h2>
-      <p class="cell-note">Record cash or Venmo received by the Treasurer and deposited into Pack checking. These deposits can offset the amount sent from Stripe when you create a Pack payout for Scout credits.</p>
+      <p class="cell-note">Record cash or Venmo received by the Treasurer and deposited into Pack checking. These are funds already in Pack checking; retain their deposit references for reconciliation.</p>
       <div id="funds-notice" class="notice" hidden></div>
       <div id="funds-orders"></div>
       <form id="funding-transfer-form" class="portal-form">
         <label class="form-field"><span>Bank deposit reference</span><input name="bank_reference" required maxlength="180" placeholder="Deposit slip or Treasurer reference"></label>
         <button class="portal-button" type="submit">Record Pack Bank Deposit</button>
       </form>
-      <h3>Deposits Available for Pack Payouts</h3><div id="funding-transfers"></div>
+      <h3>Deposit History</h3><div id="funding-transfers"></div>
     </div>
   </section>`;
 }
@@ -51,7 +51,7 @@ export async function initializeFundsAdmin() {
     const activePayouts = new Set(payoutsResult.data.filter(row => ["draft", "submitted", "paid"].includes(row.status)).map(row => row.id));
     const allocated = new Map();
     allocationsResult.data.filter(row => activePayouts.has(row.payout_id)).forEach(row => allocated.set(row.deposit_id, (allocated.get(row.deposit_id) || 0) + Number(row.amount)));
-    transfers.innerHTML = depositsResult.data.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Deposited</th><th>Amount</th><th>Reference</th><th>Used for Scout credit</th><th>Available offset</th></tr></thead><tbody>${depositsResult.data.map(row => `<tr><td>${date(row.deposited_at)}</td><td>${money(row.amount)}</td><td>${escapeHtml(row.reference)}</td><td>${money(allocated.get(row.id) || 0)}</td><td>${money(Number(row.amount) - (allocated.get(row.id) || 0))}</td></tr>`).join("")}</tbody></table></div>` : `<div class="funds-empty-state"><strong>No Pack bank deposits recorded yet.</strong><p>Confirm the Treasurer has received a paid cash or Venmo order, then enter the checking account deposit reference above.</p></div>`;
+    transfers.innerHTML = depositsResult.data.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Deposited</th><th>Amount</th><th>Reference</th><th>Applied to historical transfers</th></tr></thead><tbody>${depositsResult.data.map(row => `<tr><td>${date(row.deposited_at)}</td><td>${money(row.amount)}</td><td>${escapeHtml(row.reference)}</td><td>${money(allocated.get(row.id) || 0)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="funds-empty-state"><strong>No Pack bank deposits recorded yet.</strong><p>Confirm the Treasurer has received a paid cash or Venmo order, then enter the checking account deposit reference above.</p></div>`;
   }
 
   list.addEventListener("click", async event => {
@@ -70,7 +70,7 @@ export async function initializeFundsAdmin() {
     const button = form.querySelector('button[type="submit"]'); button.disabled = true;
     const { error } = await supabase.rpc("record_pack_bank_deposit", { p_order_ids: ids, p_reference: form.elements.bank_reference.value.trim() });
     if (!error) form.reset();
-    setNotice(notice, error ? error.message : "Pack bank deposit recorded. Its available amount can offset a Scout credit payout.", error ? "error" : "success");
+    setNotice(notice, error ? error.message : "Pack bank deposit recorded. Record any completed Scout credit allocation on the Transfers page.", error ? "error" : "success");
     button.disabled = false; await load();
   });
 

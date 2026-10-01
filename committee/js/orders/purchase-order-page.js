@@ -42,15 +42,15 @@ async function initialize({ user, profile }) {
 
   async function load() {
     try {
-      const [data,funding] = await Promise.all([PurchaseOrdersService.get(id),PurchaseOrdersService.roasterFunding(id)]);
+      const data = await PurchaseOrdersService.get(id);
       currentOrder = data.purchaseOrder;
-      render(data.purchaseOrder, data.items, data.allocations, data.manualItems || [],funding);
+      render(data.purchaseOrder, data.items, data.allocations, data.manualItems || []);
     } catch (error) {
       setNotice(notice, error.message, "error");
     }
   }
 
-  function render(order, items, allocations, manualItems,funding) {
+  function render(order, items, allocations, manualItems) {
     const target = document.querySelector("#purchase-order-detail");
     const grouped = groupBy(allocations, row => row.purchase_order_item_id);
     const statusLabel = labelStatus(order.status);
@@ -66,8 +66,6 @@ async function initialize({ user, profile }) {
         </div>
         <div class="page-actions">
           ${renderWorkflowActions(order, canManage)}
-          ${canManage && funding.enabled && ["submitted","partially_received","received"].includes(order.status) && (!funding.payout || ["failed","canceled"].includes(funding.payout.status))
-            ? `<button class="portal-button portal-button--secondary" id="fund-roaster" type="button">Fund Roaster via Pack Bank</button>` : ""}
           ${canManage && order.status === "draft" ? `
             <button class="portal-button portal-button--secondary" id="refresh-draft-po" type="button">Refresh Draft PO</button>
             <button class="portal-button" id="add-manual-line" type="button">Add Manual Line</button>
@@ -84,7 +82,7 @@ async function initialize({ user, profile }) {
         <div><span>Total Bags</span><strong>${allBagCount}</strong></div>
         ${order.submitted_at ? `<div><span>Submitted</span><strong>${formatDateTime(order.submitted_at)}</strong></div>` : ""}
         ${order.received_at ? `<div><span>Received</span><strong>${formatDateTime(order.received_at)}</strong></div>` : ""}
-        ${funding.payout ? `<div><span>Roaster Funding</span><strong>${escapeHtml(funding.payout.status)} · ${money(funding.payout.amount)}</strong></div>` : ""}
+
       </section>
 
       ${order.notes ? `<section class="panel purchase-order-notes"><h2>Notes</h2><p>${escapeHtml(order.notes)}</p></section>` : ""}
@@ -154,14 +152,6 @@ async function initialize({ user, profile }) {
       setTimeout(() => document.body.classList.remove("printing-purchase-order"), 250);
     });
     document.querySelector("#mark-submitted")?.addEventListener("click", openSubmitDialog);
-    document.querySelector("#fund-roaster")?.addEventListener("click",async event=>{
-      const estimated=sum(items,"extended_cost")+sum(manualItems,"extended_cost");
-      if(!await confirmAction({title:"Send Roaster Funding to Pack Bank?",message:`Send ${money(estimated)} from Stripe to Pack checking for ${order.po_number}? This does not pay the roaster directly or apply Scout credit.`,confirmLabel:"Send to Pack Bank"}))return;
-      const button=event.currentTarget;button.disabled=true;
-      try{const result=await PurchaseOrdersService.createRoasterFunding(id);
-        setNotice(notice,`${money(result.amount)} sent from Stripe toward Pack checking for ${result.po_number}. The Pack must pay the roaster separately.`,"success");await load();
-      }catch(error){setNotice(notice,error.message,"error");button.disabled=false;}
-    });
     document.querySelector("#mark-received")?.addEventListener("click", () => changeStatus("received"));
     document.querySelector("#refresh-draft-po")?.addEventListener("click", refreshDraft);
     document.querySelector("#add-manual-line")?.addEventListener("click", openManualDialog);

@@ -9,31 +9,12 @@ export function roasterPanelMarkup() {
       <div id="roaster-settings" class="form-grid"></div>
       <div id="roaster-notice" class="notice" hidden></div>
     </div>
-    <div class="panel"><h2>Roaster Funding Payout</h2>
-      <p class="cell-note">When enabled, a Coffee Bean may send the amount needed for a submitted purchase order from Stripe to Pack checking. The Pack then pays the roaster separately. Turn this off once Pack debit cards are available.</p>
-      <label class="checkbox-field"><input id="roaster-funding-enabled" type="checkbox"><span>Enable Roaster Funding Payout</span></label>
-      <div id="roaster-funding-notice" class="notice" hidden></div>
-    </div>
   </section>`;
 }
 
 export async function initializeRoasterAdmin() {
   const panel = document.querySelector("#roaster-settings");
   const notice = document.querySelector("#roaster-notice");
-  const fundingToggle = document.querySelector("#roaster-funding-enabled");
-  const fundingNotice = document.querySelector("#roaster-funding-notice");
-  const { data: funding, error: fundingError } = await supabase.from("roaster_funding_settings").select("enabled").eq("id",1).single();
-  if (fundingError) setNotice(fundingNotice, fundingError.message, "error");
-  else fundingToggle.checked = Boolean(funding.enabled);
-  fundingToggle.addEventListener("change",async()=>{
-    fundingToggle.disabled=true;
-    const {data:{user}}=await supabase.auth.getUser();
-    const {error}=await supabase.from("roaster_funding_settings")
-      .update({enabled:fundingToggle.checked,updated_at:new Date().toISOString(),updated_by:user?.id||null}).eq("id",1);
-    if(error)fundingToggle.checked=!fundingToggle.checked;
-    setNotice(fundingNotice,error?error.message:fundingToggle.checked?"Roaster funding payouts are enabled.":"Roaster funding payouts are off.",error?"error":"success");
-    fundingToggle.disabled=false;
-  });
   const [productsResult, settingsResult] = await Promise.all([
     supabase.from("products").select("supplier_name"),
     supabase.from("purchase_order_supplier_settings").select("supplier_name,po_email")

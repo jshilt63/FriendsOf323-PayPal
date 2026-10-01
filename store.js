@@ -1,8 +1,8 @@
 const PRODUCT_FEED_URL = "/.netlify/functions/store-products";
 const STORE_ANNOUNCEMENT_URL = "/.netlify/functions/store-announcement";
 const CART_STORAGE_KEY = "friendsOf323StorefrontCart";
-const STRIPE_CARD_RATE = 0.029;
-const STRIPE_FIXED_FEE = 0.30;
+const PROCESSING_SUPPORT_RATE = 0.0349;
+const PROCESSING_SUPPORT_FIXED = 0.49;
 
 const PRODUCT_DISPLAY = [
     {
@@ -72,11 +72,11 @@ function calculateProcessingSupport(subtotal) {
     const amount = Number(subtotal || 0);
     if (amount <= 0) return 0;
 
-    // Gross up the optional support so the Stripe fee charged on
+    // Gross up the optional support so the estimated PayPal fee on
     // the support itself is also covered. Round upward to the cent
     // to avoid coming up a penny short due to processor rounding.
-    const raw = ((amount * STRIPE_CARD_RATE) + STRIPE_FIXED_FEE)
-        / (1 - STRIPE_CARD_RATE);
+    const raw = ((amount * PROCESSING_SUPPORT_RATE) + PROCESSING_SUPPORT_FIXED)
+        / (1 - PROCESSING_SUPPORT_RATE);
 
     return Math.ceil((raw - Number.EPSILON) * 100) / 100;
 }
@@ -295,7 +295,7 @@ function createProcessingCard() {
     const description = document.createElement("p");
     description.className = "store-product-card__description";
     description.textContent =
-        "Optional support to cover the standard online card processing cost so more of your coffee purchase supports Pack 323.";
+        "Optional support toward estimated online processing costs so more of your coffee purchase supports Pack 323.";
 
     const price = document.createElement("div");
     price.className = "store-processing-price";

@@ -1,3 +1,5 @@
+HISTORICAL STRIPE DOCUMENT: This workflow is no longer used in the PayPal repository. See README-PAYPAL-TESTING.md.
+
 Friends of 323 — Scout Credit Payout Workflow
 2026-08-24
 

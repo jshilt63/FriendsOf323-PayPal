@@ -1343,7 +1343,7 @@ async function initialize({ user, profile }) {
       const venmoOrder = String(order.payment_method || order.payment_provider || "").toLowerCase() === "venmo";
       if (cashOrder && !await confirmAction({
         title: "Confirm Cash Received",
-        message: `Confirm you received the full ${money(order.order_total)} cash payment for order #${order.order_number}. This records cash received and marks the order paid; it does not charge a card or add funds to Stripe.`,
+        message: `Confirm you received the full ${money(order.order_total)} cash payment for order #${order.order_number}. This records cash received and marks the order paid; it does not charge a card or transfer funds to PayPal.`,
         confirmLabel: "Record Cash Received"
       })) return;
       if (venmoOrder && !await confirmAction({
@@ -1433,7 +1433,7 @@ async function initialize({ user, profile }) {
       setNotice(
         notice,
         isStorefrontOrder
-          ? "Order cancelled. Any Stripe payment was left unchanged."
+          ? "Order cancelled. Any payment was left unchanged."
           : "Order voided.",
         "success"
       );
@@ -1451,7 +1451,7 @@ async function initialize({ user, profile }) {
       const amount = Number(order.amount_paid || order.order_total || 0);
       if (!await confirmAction({
         title: "Cancel and Refund Order?",
-        message: `Cancel Order #${order.store_order_number || order.order_number} and refund ${money(amount)} through Stripe? This sends money back to the customer.`,
+        message: `Cancel Order #${order.store_order_number || order.order_number} and refund ${money(amount)} through PayPal? This sends money back to the customer.`,
         confirmLabel: "Cancel & Refund",
         urgent: true
       })) return;
@@ -1466,7 +1466,7 @@ async function initialize({ user, profile }) {
         closeDialog(dialog);
         setNotice(
           notice,
-          `Order cancelled and ${money(result.refunded_amount || amount)} refunded through Stripe.`,
+          `Order cancelled and ${money(result.refunded_amount || amount)} refunded through PayPal.`,
           "success"
         );
         await loadOrders();
@@ -1500,21 +1500,21 @@ async function initialize({ user, profile }) {
 
     const cancelOnlyButton = document.querySelector("#void-submit");
     const refundButton = document.querySelector("#void-refund");
-    const isPaidStripeOrder =
+    const isPaidPaypalOrder =
       isStorefrontOrder &&
-      order?.payment_provider === "stripe" &&
+      order?.payment_provider === "paypal" &&
       order?.payment_status === "paid";
 
-    cancelOnlyButton.textContent = isPaidStripeOrder
+    cancelOnlyButton.textContent = isPaidPaypalOrder
       ? "Cancel Order Only"
       : isStorefrontOrder ? "Cancel Order" : "Void Order";
 
-    refundButton.hidden = !isPaidStripeOrder;
-    if (isPaidStripeOrder) {
+    refundButton.hidden = !isPaidPaypalOrder;
+    if (isPaidPaypalOrder) {
       const amount = Number(order.amount_paid || order.order_total || 0);
       refundButton.textContent = `Cancel & Refund ${money(amount)}`;
       document.querySelector("#void-dialog-copy").textContent =
-        `This order was paid through Stripe. Cancel Order Only leaves the payment in Stripe. Cancel & Refund returns ${money(amount)} to the customer and cancels the order.`;
+        `This order was paid through PayPal. Cancel Order Only leaves the payment in PayPal. Cancel & Refund returns ${money(amount)} to the customer and cancels the order.`;
     }
 
     clearNotice(document.querySelector("#void-notice"));

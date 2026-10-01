@@ -219,7 +219,7 @@ export const OrdersService = {
     const token = sessionData?.session?.access_token;
     if (!token) throw new Error("Your session has expired. Sign in again before issuing a refund.");
 
-    const response = await fetch("/.netlify/functions/refund-order", {
+    const response = await fetch("/.netlify/functions/paypal-refund", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -228,7 +228,7 @@ export const OrdersService = {
       body: JSON.stringify({ order_id:id, reason })
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.error || "Stripe refund failed.");
+    if (!response.ok) throw new Error(body.error || "PayPal refund failed.");
     return body;
   },
   async restoreOrder(id,userId) {

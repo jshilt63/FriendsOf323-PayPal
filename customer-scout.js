@@ -1,7 +1,7 @@
 const CART_STORAGE_KEY = "friendsOf323StorefrontCart";
 const CHECKOUT_STORAGE_KEY = "friendsOf323CheckoutDraft";
 const SCOUT_FEED_URL = "/.netlify/functions/store-scouts";
-const CREATE_CHECKOUT_SESSION_URL = "/.netlify/functions/create-checkout-session";
+const PAYPAL_CREATE_ORDER_URL = "/.netlify/functions/paypal-create-order";
 const SHIPPING_RATES_URL = "/.netlify/functions/store-shipping-rates";
 const PAYMENT_METHOD_ONLINE = "online";
 const PAYMENT_METHOD_CASH = "cash";
@@ -874,7 +874,7 @@ function buildReview() {
                     >
                     <span class="payment-choice__copy">
                         <strong>Pay Online</strong>
-                        <span>PayPal checkout is being connected; you can review your order before the final payment step.</span>
+                        <span>Continue to PayPal to approve your payment.</span>
                     </span>
                 </label>
 
@@ -1032,7 +1032,14 @@ function buildStorefrontOrderPayload() {
             .filter(item => item.type === "processing")
             .reduce((sum, item) => sum + (Number(item.unitPrice) * Number(item.quantity)), 0);
 
+    const requestFingerprint = JSON.stringify({customer, items, processingCost, fulfillmentMethod});
+    let attempt = JSON.parse(sessionStorage.getItem("friends323PaypalAttempt") || "null");
+    if (!attempt || attempt.fingerprint !== requestFingerprint) {
+        attempt = {fingerprint: requestFingerprint, key: crypto.randomUUID()};
+        sessionStorage.setItem("friends323PaypalAttempt", JSON.stringify(attempt));
+    }
     return {
+        request_key: attempt.key,
         customer,
         items,
         processing_cost: processingCost,
@@ -1072,10 +1079,10 @@ async function continueToPayment() {
     result.className = "test-order-result";
     result.textContent = paymentMethod === PAYMENT_METHOD_CASH
         ? "Creating your Friends of 323 cash order…"
-        : "Checking PayPal checkout availability…";
+        : "Creating your secure PayPal checkout…";
 
     try {
-        const response = await fetch(CREATE_CHECKOUT_SESSION_URL, {
+        const response = await fetch(PAYPAL_CREATE_ORDER_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -1117,6 +1124,7 @@ async function continueToPayment() {
         window.location.assign(data.checkout_url);
 
     } catch (error) {
+        if (/expired/i.test(error.message || "")) sessionStorage.removeItem("friends323PaypalAttempt");
         console.error("Store order preparation failed:", error);
 
         result.className = "test-order-result test-order-result--error";

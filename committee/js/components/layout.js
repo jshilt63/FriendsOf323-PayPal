@@ -33,6 +33,7 @@ const sectionTabs = {
     ["Bank Deposits", "/committee/administration.html?tab=funds"],
     ["Products", "/committee/products.html"],
     ["Reports", "/committee/reports.html"],
+    ["PayPal Payments", "/committee/paypal-payments.html"],
     ["Audit", "/committee/administration.html?tab=audit"]
   ]
 };
@@ -42,7 +43,7 @@ function sectionForPage(pageTitle) {
   if (["Orders", "Customers"].includes(pageTitle)) return "Orders";
   if (["Ready to Order", "Roaster", "Purchase Orders", "Purchase Order"].includes(pageTitle)) return "Roaster";
   if (["Scouts", "Fundraising", "Transfers", "Scout Ledger", "Treasurer Payout Report"].includes(pageTitle)) return "Scouts";
-  if (["Administration", "Products", "Reports"].includes(pageTitle)) return "Administration";
+  if (["Administration", "Products", "Reports", "PayPal Payments"].includes(pageTitle)) return "Administration";
   return "Dashboard";
 }
 

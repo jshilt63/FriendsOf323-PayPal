@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Successful | Friends of Pack 323</title>
+  <title>PayPal Payment | Friends of Pack 323</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="/favicon.ico" sizes="any">
+  <script src="payment-success.js?v=paypal1" defer></script>
 </head>
 <body>
   <main class="payment-result-page">
     <section class="payment-result-card">
       <span class="payment-result-icon" aria-hidden="true">✓</span>
       <span class="hero__eyebrow">Thank You</span>
-      <h1>Payment Received</h1>
-      <p>Thank you. Stripe has accepted your payment.</p>
+      <h1>Verifying Payment</h1>
+      <p id="payment-message" aria-live="polite">Verifying your PayPal payment…</p>
       <p class="payment-result-note">
         Friends of 323 is confirming the payment automatically.
-        Once confirmed, your coffee order moves into our roaster-ordering workflow.
+        Keep this page open until payment verification finishes.
       </p>
       <a class="checkout-primary-link" href="index.html">Return to Friends of Pack 323</a>
     </section>

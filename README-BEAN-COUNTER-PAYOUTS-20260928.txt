@@ -1,3 +1,5 @@
+HISTORICAL STRIPE DOCUMENT: This workflow is no longer used in the PayPal repository. See README-PAYPAL-TESTING.md.
+
 Friends of 323 — Bean Counter, Pack bank deposits, and roaster funding
 
 Database: migrations 20260928_003 through 20260928_007 have been applied to the Friends of 323 Supabase project. Include the SQL files in source control; apply them in order to any other project or preview database. Migration 001/002 created the earlier tracking foundation.
