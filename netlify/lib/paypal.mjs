@@ -93,7 +93,7 @@ export async function createPaypalCheckout({request, requestKey, fingerprintPayl
   } else {
     order = await paypal('/v2/checkout/orders', {method: 'POST', requestId: row.id, body: {
       intent: 'CAPTURE', purchase_units: [{reference_id: row.id, custom_id: row.id, description: `Friends of 323 ${row.store_order_number || 'sandbox coffee order'}`, amount: {currency_code: 'USD', value: Number(row.amount).toFixed(2)}}],
-      payment_source: {paypal: {experience_context: {brand_name: 'Friends of 323', user_action: 'PAY_NOW', shipping_preference: 'NO_SHIPPING', return_url: `${origin}/payment-success.html?${query}`, cancel_url: `${origin}/payment-cancelled.html?${query}`}}}
+      payment_source: {paypal: {experience_context: {brand_name: 'Friends of 323', user_action: 'PAY_NOW', payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED', shipping_preference: 'NO_SHIPPING', return_url: `${origin}/payment-success.html?${query}`, cancel_url: `${origin}/payment-cancelled.html?${query}`}}}
     }});
     if (!order.id) fail('PayPal did not return an order ID.', 502);
     await db(`/rest/v1/paypal_checkouts?id=eq.${row.id}`, {method: 'PATCH', body: {paypal_order_id: order.id}});
