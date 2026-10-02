@@ -17,8 +17,8 @@ function calculateProcessingSupport(subtotal) {
   const amount = Number(subtotal || 0);
   if (amount <= 0) return 0;
 
-  const raw = ((amount * PROCESSING_SUPPORT_RATE) + PROCESSING_SUPPORT_FIXED)
-    / (1 - PROCESSING_SUPPORT_RATE);
+  const customerTotal = (amount + PROCESSING_SUPPORT_FIXED) / (1 - PROCESSING_SUPPORT_RATE);
+  const raw = customerTotal - amount;
 
   return Math.ceil((raw - Number.EPSILON) * 100) / 100;
 }
@@ -562,7 +562,7 @@ export default async (request) => {
   }
 
   if (!Number.isFinite(requestedProcessingCost) || requestedProcessingCost < 0 || requestedProcessingCost > 100) {
-    return jsonResponse(400, { error: "Processing cost is invalid." });
+    return jsonResponse(400, { error: "Online order/handling fee is invalid." });
   }
 
   if (!itemsInput.length || itemsInput.length > 50) {

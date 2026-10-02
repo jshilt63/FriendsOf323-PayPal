@@ -309,7 +309,7 @@ function buildOrderNotification(payload) {
   });
 
   const processingLine = Number(order.processing_cost || 0) > 0
-    ? `\nProcessing support: ${money(order.processing_cost)}`
+    ? `\nOnline order/handling fee: ${money(order.processing_cost)}`
     : "";
 
   const text = [
@@ -384,7 +384,7 @@ function buildOrderNotification(payload) {
       </table>
 
       ${Number(order.processing_cost || 0) > 0
-        ? `<p><strong>Processing support:</strong> ${escapeHtml(money(order.processing_cost))}</p>`
+        ? `<p><strong>Online order/handling fee:</strong> ${escapeHtml(money(order.processing_cost))}</p>`
         : ""}
 
       <p style="font-size:18px;">
@@ -444,7 +444,7 @@ function buildCustomerConfirmation(payload) {
     "",
     ...textItems.flatMap(item => [item, ""]),
     Number(order.processing_cost || 0) > 0
-      ? `Processing support: ${money(order.processing_cost)}`
+      ? `Online order/handling fee: ${money(order.processing_cost)}`
       : "",
     `Total paid: ${money(order.amount_paid)}`,
     "",
@@ -571,7 +571,7 @@ function buildCustomerConfirmation(payload) {
                        style="background:#fbf8f1;border-radius:7px;">
                   <tr>
                     <td style="padding:10px 12px;color:#5f5a50;font-size:13px;">
-                      Processing Cost Support
+                      Online order/handling fee
                     </td>
                     <td style="padding:10px 12px;text-align:right;color:#0e3a2f;font-weight:700;font-size:13px;">
                       ${escapeHtml(money(order.processing_cost))}

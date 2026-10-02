@@ -1,8 +1,8 @@
 const PRODUCT_FEED_URL = "/.netlify/functions/store-products";
 const STORE_ANNOUNCEMENT_URL = "/.netlify/functions/store-announcement";
 const CART_STORAGE_KEY = "friendsOf323StorefrontCart";
-const PROCESSING_SUPPORT_RATE = 0.0349;
-const PROCESSING_SUPPORT_FIXED = 0.49;
+const ONLINE_HANDLING_RATE = 0.0349;
+const ONLINE_HANDLING_FIXED = 0.49;
 
 const PRODUCT_DISPLAY = [
     {
@@ -68,28 +68,29 @@ function coffeeSubtotal() {
         .reduce((sum, item) => sum + (Number(item.unitPrice) * Number(item.quantity)), 0);
 }
 
-function calculateProcessingSupport(subtotal) {
+function calculateOnlineHandlingFee(subtotal) {
     const amount = Number(subtotal || 0);
     if (amount <= 0) return 0;
 
-    // Gross up the optional support so the estimated PayPal fee on
-    // the support itself is also covered. Round upward to the cent
-    // to avoid coming up a penny short due to processor rounding.
-    const raw = ((amount * PROCESSING_SUPPORT_RATE) + PROCESSING_SUPPORT_FIXED)
-        / (1 - PROCESSING_SUPPORT_RATE);
+    // Gross up the order total so the handling fee also covers the
+    // PayPal percentage charged on the fee itself:
+    // customer total = (subtotal + $0.49) / (1 - 0.0349)
+    // fee = customer total - subtotal.
+    const customerTotal = (amount + ONLINE_HANDLING_FIXED) / (1 - ONLINE_HANDLING_RATE);
+    const raw = customerTotal - amount;
 
     return Math.ceil((raw - Number.EPSILON) * 100) / 100;
 }
 
-function processingSupportItem() {
+function onlineHandlingFeeItem() {
     return cart.find(item => item.type === "processing") || null;
 }
 
-function syncProcessingSupport() {
-    const existing = processingSupportItem();
+function syncOnlineHandlingFee() {
+    const existing = onlineHandlingFeeItem();
     if (!existing) return;
 
-    const amount = calculateProcessingSupport(coffeeSubtotal());
+    const amount = calculateOnlineHandlingFee(coffeeSubtotal());
 
     if (amount <= 0) {
         cart = cart.filter(item => item.type !== "processing");
@@ -273,7 +274,7 @@ function createProductCard(config, variants) {
     return card;
 }
 
-function createProcessingCard() {
+function createOnlineHandlingCard() {
     const card = document.createElement("article");
     card.className = "store-product-card store-product-card--processing";
 
@@ -282,7 +283,7 @@ function createProcessingCard() {
 
     const image = document.createElement("img");
     image.src = "images/processing-cost.png";
-    image.alt = "Processing Cost";
+    image.alt = "Online order/handling fee";
     image.loading = "lazy";
     imageWrap.appendChild(image);
 
@@ -290,12 +291,12 @@ function createProcessingCard() {
     body.className = "store-product-card__body";
 
     const title = document.createElement("h3");
-    title.textContent = "Processing Cost";
+    title.textContent = "Online order/handling fee";
 
     const description = document.createElement("p");
     description.className = "store-product-card__description";
     description.textContent =
-        "Optional support toward estimated online processing costs so more of your coffee purchase supports Pack 323.";
+        "Optional online order/handling fee calculated to cover the estimated cost of processing this online order.";
 
     const price = document.createElement("div");
     price.className = "store-processing-price";
@@ -307,28 +308,28 @@ function createProcessingCard() {
     action.dataset.processingAction = "true";
 
     action.addEventListener("click", () => {
-        toggleProcessingSupport();
+        toggleOnlineHandlingFee();
     });
 
     body.append(title, description, price, action);
     card.append(imageWrap, body);
 
-    updateProcessingCard(card);
+    updateOnlineHandlingCard(card);
     return card;
 }
 
-function updateProcessingCard(card = document.querySelector(".store-product-card--processing")) {
+function updateOnlineHandlingCard(card = document.querySelector(".store-product-card--processing")) {
     if (!card) return;
 
     const subtotal = coffeeSubtotal();
-    const amount = calculateProcessingSupport(subtotal);
+    const amount = calculateOnlineHandlingFee(subtotal);
     const price = card.querySelector('[data-processing-amount="true"]');
     const action = card.querySelector('[data-processing-action="true"]');
-    const included = Boolean(processingSupportItem());
+    const included = Boolean(onlineHandlingFeeItem());
 
     if (subtotal <= 0) {
         price.textContent = "Add coffee to calculate";
-        action.textContent = "Processing Support Optional";
+        action.textContent = "Online order/handling fee Optional";
         action.disabled = true;
         return;
     }
@@ -337,28 +338,28 @@ function updateProcessingCard(card = document.querySelector(".store-product-card
     action.disabled = false;
 
     if (included) {
-        action.textContent = `Remove ${money(amount)} Processing Support`;
+        action.textContent = `Remove ${money(amount)} Online order/handling fee`;
         action.classList.add("store-card-action--remove");
     } else {
-        action.textContent = `Add ${money(amount)} to Cover Processing`;
+        action.textContent = `Add ${money(amount)} Online order/handling fee`;
         action.classList.remove("store-card-action--remove");
     }
 }
 
-function toggleProcessingSupport() {
-    const existing = processingSupportItem();
+function toggleOnlineHandlingFee() {
+    const existing = onlineHandlingFeeItem();
 
     if (existing) {
         cart = cart.filter(item => item.type !== "processing");
     } else {
-        const amount = calculateProcessingSupport(coffeeSubtotal());
+        const amount = calculateOnlineHandlingFee(coffeeSubtotal());
         if (amount <= 0) return;
 
         cart.push({
             type: "processing",
             productId: null,
             sku: "PROCESSING",
-            productName: "Processing Cost Support",
+            productName: "Online order/handling fee",
             bagSize: null,
             grind: null,
             unitPrice: amount,
@@ -392,7 +393,7 @@ function addProductToCart(product, grind) {
         });
     }
 
-    syncProcessingSupport();
+    syncOnlineHandlingFee();
     saveCart();
     renderCart();
 }
@@ -406,14 +407,14 @@ function changeQuantity(index, delta) {
         cart.splice(index, 1);
     }
 
-    syncProcessingSupport();
+    syncOnlineHandlingFee();
     saveCart();
     renderCart();
 }
 
 function removeCartItem(index) {
     cart.splice(index, 1);
-    syncProcessingSupport();
+    syncOnlineHandlingFee();
     saveCart();
     renderCart();
 }
@@ -444,9 +445,9 @@ function renderCart() {
         summary.hidden = true;
         items.innerHTML = "";
 
-        // Reset the Processing Cost card immediately when the
+        // Reset the Online order/handling fee card immediately when the
         // last coffee item is removed from the cart.
-        updateProcessingCard();
+        updateOnlineHandlingCard();
         return;
     }
 
@@ -475,7 +476,7 @@ function renderCart() {
             details.className = "cart-item__details";
 
             const name = document.createElement("strong");
-            name.textContent = "Processing Cost Support";
+            name.textContent = "Online order/handling fee";
 
             const meta = document.createElement("span");
             meta.textContent = "Optional • recalculated automatically when your coffee order changes";
@@ -549,7 +550,7 @@ function renderCart() {
     });
 
     total.textContent = money(cartTotal());
-    updateProcessingCard();
+    updateOnlineHandlingCard();
 }
 
 function renderProducts(products) {
@@ -570,7 +571,7 @@ function renderProducts(products) {
         }
     });
 
-    grid.appendChild(createProcessingCard());
+    grid.appendChild(createOnlineHandlingCard());
 
     status.hidden = true;
     grid.hidden = false;
@@ -688,7 +689,7 @@ function initializeMenu() {
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeMenu();
-    syncProcessingSupport();
+    syncOnlineHandlingFee();
     renderCart();
     loadProducts();
     loadStoreAnnouncement();
