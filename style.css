@@ -2556,3 +2556,35 @@ a {
     .store-announcement-banner__inner { width: min(calc(100% - 2rem), var(--page-width)); align-items: center; flex-direction: column; gap: .25rem; }
     .store-announcement-dialog__card { padding: 1.5rem; }
 }
+
+/* Optional processing support in checkout */
+.checkout-processing-support {
+    margin-top: 22px;
+    padding: 20px;
+    border: 2px solid #174d3c;
+    border-radius: 12px;
+    background: #eef5ef;
+}
+.checkout-processing-support h4 {
+    margin: 0 0 14px;
+    color: #143e32;
+    font-size: 1.15rem;
+}
+.checkout-processing-support__choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+.checkout-processing-support__choice input {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: #174d3c;
+}
+.checkout-processing-support p {
+    margin: 12px 0 0;
+    font-size: .95rem;
+    line-height: 1.5;
+}

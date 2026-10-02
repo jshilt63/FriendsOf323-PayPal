@@ -749,6 +749,26 @@ function syncPaymentMethodUi() {
 }
 
 
+function checkoutProcessingSupportAmount() {
+    const subtotal = cart.filter(item => item.type === "product")
+        .reduce((sum, item) => sum + Number(item.unitPrice) * Number(item.quantity), 0);
+    if (subtotal <= 0) return 0;
+    return Math.ceil((((subtotal * 0.0349) + 0.49) / (1 - 0.0349)) * 100) / 100;
+}
+
+function setCheckoutProcessingSupport(included) {
+    cart = cart.filter(item => item.type !== "processing");
+    const amount = checkoutProcessingSupportAmount();
+    if (included && selectedPaymentMethod() === PAYMENT_METHOD_ONLINE && amount > 0) {
+        cart.push({type: "processing", productId: null, sku: "PROCESSING",
+            productName: "Processing Cost Support", bagSize: null, grind: null,
+            unitPrice: amount, quantity: 1});
+    }
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    renderCartReview();
+    buildReview();
+}
+
 function buildReview() {
     const form = document.querySelector("#customer-scout-form");
     const customer = Object.fromEntries(new FormData(form).entries());
@@ -895,6 +915,18 @@ function buildReview() {
                 </label>
             </div>
 
+            ${selectedPaymentMethod() === PAYMENT_METHOD_ONLINE ? `
+            <div class="checkout-processing-support">
+                <h4>Help your coffee purchase go further</h4>
+                <label class="checkout-processing-support__choice">
+                    <input type="checkbox" id="checkout-processing-support"
+                        ${cart.some(item => item.type === "processing") ? "checked" : ""}
+                        aria-describedby="checkout-processing-support-note">
+                    <span><strong>Yes, add ${money(checkoutProcessingSupportAmount())} to help cover processing costs</strong></span>
+                </label>
+                <p id="checkout-processing-support-note">Optional. Your support helps more of your coffee purchase benefit Pack 323. This is an estimate of online processing costs, including processing on this extra amount.</p>
+            </div>` : ""}
+
             <p id="cash-payment-note" class="payment-method-note" ${selectedPaymentMethod() === PAYMENT_METHOD_CASH ? "" : "hidden"}>
                 Your order will be recorded as awaiting payment until the cash is received and marked paid in the Friends of 323 portal.
             </p>
@@ -914,6 +946,10 @@ function buildReview() {
             <strong>${money(checkoutGrandTotal())}</strong>
         </div>
     `;
+
+    review.querySelector("#checkout-processing-support")?.addEventListener("change", event => {
+        setCheckoutProcessingSupport(event.target.checked);
+    });
 
     review.querySelectorAll('input[name="store_payment_method"]').forEach(input => {
         input.addEventListener("change", syncPaymentMethodUi);
